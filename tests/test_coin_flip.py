@@ -23,5 +23,11 @@ class SeenSequence:
 
 
 def test_coin_flip() -> None:
-    assert pytest.approx(4, abs=0.1) == markov_chain.run(SeenSequence(None, None), SeenSequence("H", "T"), 1_000, seed=2)
-    assert pytest.approx(6, abs=0.1) == markov_chain.run(SeenSequence(None, None), SeenSequence("H", "H"), 1_000, seed=2)
+    times_to_test = 1_000
+    times_reached, avg_steps_taken = markov_chain.run(SeenSequence(None, None), (SeenSequence("H", "T"),), times_to_test, seed=2)[0]
+    assert pytest.approx(4, abs=0.1) == avg_steps_taken
+    assert times_reached == times_to_test
+
+    times_reached, avg_steps_taken = markov_chain.run(SeenSequence(None, None), (SeenSequence("H", "H"),), times_to_test, seed=2)[0]
+    assert pytest.approx(6, abs=0.1) == avg_steps_taken
+    assert times_reached == times_to_test
