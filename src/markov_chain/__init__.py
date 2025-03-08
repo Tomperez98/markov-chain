@@ -1,21 +1,22 @@
 from __future__ import annotations
 
-from typing import Literal, Protocol, Self
+from random import Random
+from typing import Protocol, Self
 
 
 class State(Protocol):
-    def transition(self, k: int) -> None: ...
+    def transition(self, k: int, rnd: Random) -> Self: ...
 
 
-def run[T: State](initial: T, goal: T, n: int, max_iterations: int = -1) -> float:
+def run[T: State](initial: T, goal: T, n: int, max_iterations: int = -1, seed: int | None = None) -> float:
+    rnd = Random(seed)
     sum: int = 0
     for _ in range(n):
-        sum += _run(initial, goal, max_iterations)
-
+        sum += _run(initial, goal, max_iterations, rnd)
     return sum / n
 
 
-def _run(initial: State, goal: State, max_iterations: int) -> int:
+def _run(initial: State, goal: State, max_iterations: int, rnd: Random) -> int:
     k = 0
     match max_iterations:
         case -1:
@@ -23,11 +24,9 @@ def _run(initial: State, goal: State, max_iterations: int) -> int:
         case _:
             expr = lambda: k <= max_iterations
 
-    # print(f"k={k} state={initial}")
     while expr():
-        initial.transition(k)
+        initial = initial.transition(k, rnd)
         k += 1
-        # print(f"k={k} state={initial}")
         if initial == goal:
             break
     return k
